@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import RegistrationScreen from "./Screens/RegistrationScreen/RegistrationScreen";
 import { useFonts } from "expo-font";
 import LoginScreen from "./Screens/LoginScreen/LoginScreen";
+import RegNew from "./Screens/exemple";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -16,7 +17,6 @@ export default function App() {
     <>
       {/* <RegistrationScreen /> */}
       <LoginScreen />
-
       <StatusBar style="auto" />
     </>
   );
@@ -30,3 +30,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+{
+  /* <RegNew /> */
+}
