@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import { styles } from "../../styles/styles";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -8,16 +9,16 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   SafeAreaView,
-  ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const RegistrationScreen = () => {
+  const navigation = useNavigation();
   const [login, setLogin] = useState("");
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
@@ -54,6 +55,7 @@ const RegistrationScreen = () => {
 E-mail: ${mail}
 Пароль: ${pass}`
     );
+    navigation.navigate("Home");
   };
 
   return (
@@ -117,7 +119,9 @@ E-mail: ${mail}
             <TouchableOpacity style={styles.button} onPress={registeretions}>
               <Text style={styles.buttonText}>Зареєстуватися</Text>
             </TouchableOpacity>
-            <Text style={styles.loginLink}>Вже є акаунт? Увійти</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.loginLink}>Вже є акаунт? Увійти</Text>
+            </TouchableOpacity>
           </View>
         </ImageBackground>
         <StatusBar style="auto" />
@@ -128,95 +132,4 @@ E-mail: ${mail}
 
 export default RegistrationScreen;
 
-const screenSize = Dimensions.get("screen");
-
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  image: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  text: {
-    marginTop: 92,
-    fontSize: 30,
-    lineHeight: 84,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#212121",
-    fontFamily: "Roboto",
-    fontStyle: "normal",
-    fontWeight: "500",
-    letterSpacing: 0.3,
-  },
-  form: {
-    position: "relative",
-    width: "100%",
-    backgroundColor: "#fff",
-    borderTopRightRadius: 25,
-    borderTopLeftRadius: 25,
-    paddingLeft: 16,
-    paddingRight: 16,
-  },
-  addPhoto: {
-    position: "absolute",
-    top: -60,
-    left: "50%",
-    width: 120,
-    height: 120,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 16,
-    transform: [{ translateX: -60 }],
-  },
-  addBtn: {
-    position: "absolute",
-    right: -12.5,
-    bottom: 14,
-    width: 25,
-    height: 25,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 13,
-  },
-
-  input: {
-    height: 50,
-    padding: 16,
-    borderColor: "#E8E8E8",
-    borderStyle: "solid",
-    borderWidth: 1,
-    marginBottom: 16,
-    color: "#212121",
-    fontFamily: "Roboto",
-    fontSize: 16,
-    fontWeight: "400",
-    borderRadius: 10,
-  },
-  button: {
-    height: 50,
-    paddingLeft: 32,
-    paddingRight: 32,
-    paddingBottom: 16,
-    paddingTop: 16,
-    marginTop: 43,
-    marginBottom: 16,
-    borderRadius: 100,
-    backgroundColor: "#FF6C00",
-  },
-  buttonText: {
-    color: "#fff",
-    fontFamily: "Roboto",
-    fontSize: 16,
-    fontWeight: "400",
-    textAlign: "center",
-  },
-  loginLink: {
-    color: "#1B4371",
-    fontFamily: "Roboto",
-    fontSize: 16,
-    fontWeight: "400",
-    textAlign: "center",
-    marginBottom: 78,
-  },
-});
+// const screenSize = Dimensions.get("screen");

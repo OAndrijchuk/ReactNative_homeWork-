@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { styles } from "../RegistrationScreen/RegistrationScreen";
+import { styles } from "../../styles/styles";
 import {
   Alert,
-  Image,
   ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
@@ -14,8 +13,10 @@ import {
   View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { useNavigation } from "@react-navigation/native";
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   // const [isShowKeyboard, setIsShowKeyboard] = useState(false);
@@ -49,6 +50,7 @@ const LoginScreen = () => {
       `E-mail: ${mail}
 Пароль: ${pass}`
     );
+    navigation.navigate("Home");
   };
 
   return (
@@ -99,9 +101,13 @@ const LoginScreen = () => {
             <TouchableOpacity style={styles.button} onPress={logIn}>
               <Text style={styles.buttonText}>Увійти</Text>
             </TouchableOpacity>
-            <Text style={{ ...styles.loginLink, marginBottom: 144 }}>
-              Немає акаунту? Зареєструватися
-            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Registration")}
+            >
+              <Text style={{ ...styles.loginLink, marginBottom: 144 }}>
+                Немає акаунту? Зареєструватися
+              </Text>
+            </TouchableOpacity>
           </View>
         </ImageBackground>
         <StatusBar style="auto" />
