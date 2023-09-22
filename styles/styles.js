@@ -89,4 +89,15 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 78,
   },
+  headerTitleStyle: {
+    width: "100%",
+    marginHorizontal: "auto",
+    color: "#212121",
+    textAlign: "center",
+    fontFamily: "Roboto",
+    fontSize: 17,
+    fontWeight: "500",
+    lineHeight: 22 /* 129.412% */,
+    letterSpacing: -0.408,
+  },
 });
