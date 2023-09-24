@@ -13,7 +13,6 @@ export const styles = StyleSheet.create({
     marginTop: 92,
     fontSize: 30,
     lineHeight: 84,
-    fontWeight: "bold",
     textAlign: "center",
     color: "#212121",
     fontFamily: "Roboto",
