@@ -202,7 +202,7 @@ const createPostStyles = StyleSheet.create({
   camera: {
     position: "relative",
     width: "100%",
-    height: 340,
+    height: 240,
     backgroundColor: "#F6F6F6",
   },
   cameraIMG: {
