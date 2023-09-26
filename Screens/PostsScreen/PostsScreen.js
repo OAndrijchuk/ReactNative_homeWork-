@@ -12,25 +12,47 @@ import { ScrollView } from "react-native";
 import { Image } from "react-native";
 import ComentsSVG from "../../Components/ComentsSVG/ComentsSVG";
 import MapPinSVG from "../../Components/MapPinSVG/MapPinSVG";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const defaultPosts = [
   {
+    id: 3,
     img: require("../../picture/forest-default.jpg"),
     title: "Ліс",
     comentsCount: 0,
-    location: `Ivano-Frankivs'k Region, Ukraine`,
+    locationName: `Ivano-Frankivs'k Region, Ukraine`,
+    location: {
+      latitude: 37.78825,
+      longitude: -122.4324,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    },
   },
   {
+    id: 2,
     img: require("../../picture/forest-default.jpg"),
     title: "Ліс",
     comentsCount: 0,
-    location: `Ivano-Frankivs'k Region, Ukraine`,
+    locationName: `Ivano-Frankivs'k Region, Ukraine`,
+    location: {
+      latitude: 37.78825,
+      longitude: -122.4324,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    },
   },
   {
+    id: 1,
     img: require("../../picture/forest-default.jpg"),
     title: "Ліс",
     comentsCount: 0,
-    location: `Ivano-Frankivs'k Region, Ukraine`,
+    locationName: `Ivano-Frankivs'k Region, Ukraine`,
+    location: {
+      latitude: 37.78825,
+      longitude: -122.4324,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    },
   },
 ];
 
@@ -41,6 +63,22 @@ const PostsScreen = () => {
   const [userName, setUserName] = useState("Anonimus");
   const [userEmail, setUserEmail] = useState("anonimus@mail.com");
   const [posts, setPosts] = useState(defaultPosts);
+
+  const navigation = useNavigation();
+  const { params } = useRoute();
+  if (params && !posts.some((el) => params.id === el.id)) {
+    setPosts((prev) => [...prev, params]);
+  }
+
+  const showMap = (item) => {
+    navigation.navigate("MapScreen", {
+      location: item.location,
+      title: item.title,
+    });
+  };
+  const showComents = (item) => {
+    navigation.navigate("CommentsScreen", item);
+  };
 
   return (
     <ScrollView style={postsStyles.container}>
@@ -77,7 +115,9 @@ const PostsScreen = () => {
                   alignItems: "center",
                 }}
               >
-                <ComentsSVG />
+                <TouchableOpacity onPress={() => showComents(item)}>
+                  <ComentsSVG />
+                </TouchableOpacity>
                 <Text style={postsStyles.userEmail}>{item.comentsCount}</Text>
               </View>
               <View
@@ -87,8 +127,11 @@ const PostsScreen = () => {
                   alignItems: "center",
                 }}
               >
-                <MapPinSVG />
-                <Text style={postsStyles.userEmail}>{item.location}</Text>
+                <TouchableOpacity onPress={() => showMap(item)}>
+                  <MapPinSVG />
+                </TouchableOpacity>
+
+                <Text style={postsStyles.userEmail}>{item.locationName}</Text>
               </View>
             </View>
           </View>

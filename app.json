@@ -22,7 +22,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.yourapp.package.name",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBGgEXg6s7gqVXeIYN_GRy96OaM6L1qrc0"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -13,25 +13,79 @@ import { StyleSheet } from "react-native";
 import { KeyboardAvoidingView } from "react-native";
 import { Keyboard } from "react-native";
 import MapPinSVG from "../../Components/MapPinSVG/MapPinSVG";
+import * as Location from "expo-location";
+import PhotoBtnSVG from "../../Components/PhotoBtnSVG/PhotoBtnSVG";
+import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
+import { useNavigation } from "@react-navigation/native";
 
 const CreatePostsScreen = () => {
-  const [photo, setPhoto] = useState({});
   const [photoName, setPhotoName] = useState("");
   const [photoLocetion, setPhotoLocetion] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [cameraRef, setCameraRef] = useState(null);
+  const [photo, setPhoto] = useState("");
+  const navigation = useNavigation();
 
   useEffect(() => {
-    if (Object.keys(photo).length !== 0 && photoName && photoLocetion) {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+
+      setHasPermission(status === "granted");
+    })();
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      };
+      setLocation(coords);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (photo && photoName && photoLocetion) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
     }
   }, [photo, photoName, photoLocetion]);
 
+  if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+  const takePhoto = async () => {
+    const pic = await cameraRef.takePictureAsync();
+    setPhoto(pic.uri);
+    console.log("====================================");
+    console.log(pic.uri);
+    console.log("====================================");
+  };
+
   const publicPost = () => {
-    console.log("====================================");
-    console.log("ви опублікували  свій пост");
-    console.log("====================================");
+    console.log(location);
+    navigation.navigate("PostsScreen", {
+      id: 4,
+      img: photo,
+      location: location,
+      title: photoName,
+      comentsCount: 0,
+      locationName: photoLocetion,
+    });
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -42,25 +96,22 @@ const CreatePostsScreen = () => {
           paddingHorizontal: 16,
         }}
       >
-        <TouchableOpacity
-          style={{
-            borderRadius: 8,
-            backgroundColor: "#F6F6F6",
-          }}
-        >
-          <Image
-            style={{
-              width: "100%",
-              height: 240,
-              backgroundColor: "#F6F6F6",
-            }}
-            source={require("../../picture/image-not-found.jpg")}
-          />
-        </TouchableOpacity>
+        <Camera style={createPostStyles.camera} ref={setCameraRef}>
+          {photo ? (
+            <View style={createPostStyles.cameraIMG}>
+              <Image sorce={{ uri: photo }} />
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={createPostStyles.buttonPhoto}
+              onPress={takePhoto}
+            >
+              <PhotoBtnSVG />
+            </TouchableOpacity>
+          )}
+        </Camera>
         <Text style={createPostStyles.photoText}>
-          {Object.keys(photo).length !== 0
-            ? "Редагувати фото"
-            : "Завантажте фото"}
+          {photo ? "Редагувати фото" : "Завантажте фото"}
         </Text>
         <KeyboardAvoidingView
           style={createPostStyles.inputWraper}
@@ -91,6 +142,7 @@ const CreatePostsScreen = () => {
                 ? styles.button
                 : [styles.button, { backgroundColor: "#F6F6F6" }]
             }
+            // onPress={isFormValid ? publicPost : null}
             onPress={publicPost}
           >
             <Text
@@ -138,22 +190,26 @@ const createPostStyles = StyleSheet.create({
     top: "50%",
     transform: [{ translateY: -12 }],
   },
-  // buttonText: {
-  //   color: "#fff",
-  //   fontFamily: "Roboto",
-  //   fontSize: 16,
-  //   fontWeight: "400",
-  //   textAlign: "center",
-  // },
-  // buttonActiv: {
-  //   height: 50,
-  //   paddingLeft: 32,
-  //   paddingRight: 32,
-  //   paddingBottom: 16,
-  //   paddingTop: 16,
-  //   marginTop: 43,
-  //   marginBottom: 16,
-  //   borderRadius: 100,
-  //   backgroundColor: "#FF6C00",
-  // },
+  buttonPhoto: {
+    width: 60,
+    height: 60,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: -30 }, { translateY: -30 }],
+    borderRadius: 8,
+  },
+  camera: {
+    position: "relative",
+    width: "100%",
+    height: 340,
+    backgroundColor: "#F6F6F6",
+  },
+  cameraIMG: {
+    position: "absolute",
+    zIndex: 10,
+    width: 200,
+    height: 200,
+    backgroundColor: "#F6F6F6",
+  },
 });
