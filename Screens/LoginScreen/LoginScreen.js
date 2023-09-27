@@ -14,43 +14,31 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { loginThunk } from "../../redux/auth/operetions";
+import { isAuthSelector } from "../../redux/auth/selectors";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
-  // const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const dispatch = useDispatch();
+  const isAuth = useSelector(isAuthSelector);
+  useEffect(() => {
+    return () => {
+      setMail("");
+      setPass("");
+    };
+  }, []);
+  useEffect(() => {
+    console.log("isAuth===>>>", isAuth);
+    if (isAuth) {
+      navigation.navigate("Home");
+    }
+  }, [isAuth]);
 
-  // useEffect(() => {
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     "keyboardDidShow",
-  //     handleKeyboardDidShow
-  //   );
-  //   const keyboardDidHideListener = Keyboard.addListener(
-  //     "keyboardDidHide",
-  //     handleKeyboardDidHide
-  //   );
-
-  //   return () => {
-  //     keyboardDidShowListener.remove();
-  //     keyboardDidHideListener.remove();
-  //   };
-  // }, []);
-
-  // const handleKeyboardDidShow = () => {
-  //   setIsShowKeyboard(true);
-  // };
-
-  // const handleKeyboardDidHide = () => {
-  //   setIsShowKeyboard(false);
-  // };
   const logIn = () => {
-    Alert.alert(
-      "Credentials",
-      `E-mail: ${mail}
-Пароль: ${pass}`
-    );
-    navigation.navigate("Home");
+    dispatch(loginThunk({ email: mail, password: pass }));
   };
 
   return (
@@ -61,10 +49,7 @@ const LoginScreen = () => {
           resizeMode="cover"
           style={styles.image}
         >
-          <View
-            // style={{ ...styles.form, marginBottom: isShowKeyboard ? -250 : 0 }}
-            style={styles.form}
-          >
+          <View style={styles.form}>
             <Text style={{ ...styles.text, marginTop: 32 }}>Увійти</Text>
             <KeyboardAvoidingView
               behavior={Platform.OS === "ios" ? "padding" : "height"}

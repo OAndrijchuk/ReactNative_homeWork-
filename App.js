@@ -8,7 +8,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Home from "./Screens/Home/Home";
 import MapScreen from "./Screens/MapScreen/MapScreen";
 import CommentsScreen from "./Screens/CommentsScreen/CommentsScreen";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import store from "./redux/store";
 

@@ -1,42 +1,43 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { register } from "./operetions";
-
+import { loginThunk, register } from "./operetions";
+// email: "",
+// password: "",
+// login: "",
 const initialState = {
-  user: {
-    email: "",
-    password: "",
-    login: "",
-  },
+  user: {},
   isAuth: false,
-  isRefresh: false,
   error: "",
   token: "",
 };
 export const authSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    logOutAC: (state) => {
+      state.user = {};
+      state.isAuth = false;
+      state.token = "";
+      state.error = "";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(register.fulfilled, (state, { payload }) => {
         state.user = payload;
-        console.log("User===>", payload);
         state.isAuth = true;
       })
       .addCase(register.pending, (state, action) => {})
-      .addCase(register.rejected, (state, action) => {});
-    //       .addCase(loginThunk.fulfilled, (state, { payload }) => {
-    //         state.user = payload.user;
-    //         state.token = payload.token;
-    //         state.isLoading = false;
-    //         state.isAuth = true;
-    //       })
-    //       .addCase(loginThunk.pending, (state, action) => {
-    //         state.isLoading = true;
-    //       })
-    //       .addCase(loginThunk.rejected, (state, action) => {
-    //         state.isLoading = false;
-    //       })
+      .addCase(register.rejected, (state, action) => {
+        alert("Введені не коректні дані!!!");
+      })
+      .addCase(loginThunk.fulfilled, (state, { payload }) => {
+        state.user = payload;
+        state.isAuth = true;
+      })
+      .addCase(loginThunk.pending, (state, action) => {})
+      .addCase(loginThunk.rejected, (state, action) => {
+        alert("Введені не коректні дані!!!");
+      });
     //       .addCase(logoutThunk.fulfilled, (state, action) => {
     //         state.user = {
     //           name: "",
@@ -69,3 +70,4 @@ export const authSlice = createSlice({
 });
 
 export const userReducer = authSlice.reducer;
+export const { logOutAC } = authSlice.actions;

@@ -16,8 +16,9 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { register } from "../../redux/auth/operetions";
+import { isAuthSelector } from "../../redux/auth/selectors";
 
 const RegistrationScreen = () => {
   const navigation = useNavigation();
@@ -25,42 +26,24 @@ const RegistrationScreen = () => {
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const dispatch = useDispatch();
+  const isAuth = useSelector(isAuthSelector);
+  useEffect(() => {
+    console.log("isAuth===>>>", isAuth);
+    if (isAuth) {
+      navigation.navigate("Home");
+    }
+  }, [isAuth]);
 
-  // const [isShowKeyboard, setIsShowKeyboard] = useState(false);
-
-  // useEffect(() => {
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     "keyboardDidShow",
-  //     handleKeyboardDidShow
-  //   );
-  //   const keyboardDidHideListener = Keyboard.addListener(
-  //     "keyboardDidHide",
-  //     handleKeyboardDidHide
-  //   );
-
-  //   return () => {
-  //     keyboardDidShowListener.remove();
-  //     keyboardDidHideListener.remove();
-  //   };
-  // }, []);
-
-  // const handleKeyboardDidShow = () => {
-  //   setIsShowKeyboard(true);
-  // };
-
-  // const handleKeyboardDidHide = () => {
-  //   setIsShowKeyboard(false);
-  // };
+  useEffect(() => {
+    return () => {
+      setMail("");
+      setPass("");
+      setLogin("");
+    };
+  }, []);
 
   const registeretions = () => {
     dispatch(register({ email: mail, password: pass }));
-    //     Alert.alert(
-    //       "Credentials",
-    //       `Логін: ${login}
-    // E-mail: ${}
-    // Пароль: ${}`
-    // );
-    // navigation.navigate("Home");
   };
 
   return (
@@ -136,5 +119,3 @@ const RegistrationScreen = () => {
 };
 
 export default RegistrationScreen;
-
-// const screenSize = Dimensions.get("screen");

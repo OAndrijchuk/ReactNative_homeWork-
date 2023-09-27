@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styles } from "../../styles/styles";
-import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { View } from "react-native";
 import { ScrollView } from "react-native";
 import { Image } from "react-native";
@@ -14,7 +8,6 @@ import ComentsSVG from "../../Components/ComentsSVG/ComentsSVG";
 import MapPinSVG from "../../Components/MapPinSVG/MapPinSVG";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { register } from "../../redux/auth/operetions";
-import { useDispatch } from "react-redux";
 
 const defaultPosts = [
   {
@@ -65,7 +58,6 @@ const PostsScreen = () => {
   const [userName, setUserName] = useState("Anonimus");
   const [userEmail, setUserEmail] = useState("anonimus@mail.com");
   const [posts, setPosts] = useState(defaultPosts);
-
   const navigation = useNavigation();
   const { params } = useRoute();
 

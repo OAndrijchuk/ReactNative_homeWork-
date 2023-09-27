@@ -10,38 +10,33 @@ import { auth } from "../../config";
 export const register = createAsyncThunk(
   "auth/reg",
   async (credentials, thunkAPI) => {
+    const { email, password } = credentials;
     try {
-      const { email, password } = credentials;
       const newUser = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      const user = newUser.user;
-      //   console.log("====================================");
-      //   console.log(newUser);
-      //   console.log("====================================");
-      //   Alert.alert("Credentials===>", newUser);
-      return user;
+      return newUser.user;
     } catch (error) {
+      alert("Введені не коректні дані!!!");
       return thunkAPI.rejectWithValue(error);
     }
   }
 );
 
-// export const loginThunk = createAsyncThunk(
-//   "auth/login",
-//   async (credentials, thunkAPI) => {
-//     try {
-//       const res = await API.post("/api/auth/sign-in", credentials);
-//       setToken(res.data.token);
-
-//       return res.data;
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error);
-//     }
-//   }
-// );
+export const loginThunk = createAsyncThunk(
+  "auth/login",
+  async (credentials, thunkAPI) => {
+    const { email, password } = credentials;
+    try {
+      const userData = await signInWithEmailAndPassword(auth, email, password);
+      return userData.user;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
 
 // export const logoutThunk = createAsyncThunk(
 //   "auth/logout",
@@ -74,30 +69,10 @@ export const register = createAsyncThunk(
 //   }
 // );
 
-// const registerDB = async ({ email, password }) => {
-//   try {
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
-// або більш короткий запис цієї функції
-const registerDB = ({ email, password }) =>
-  createUserWithEmailAndPassword(auth, email, password);
-
 const authStateChanged = async (onChange = () => {}) => {
   onAuthStateChanged((user) => {
     onChange(user);
   });
-};
-
-const loginDB = async ({ email, password }) => {
-  try {
-    const credentials = await signInWithEmailAndPassword(auth, email, password);
-    return credentials.user;
-  } catch (error) {
-    throw error;
-  }
 };
 
 const updateUserProfile = async (update) => {
