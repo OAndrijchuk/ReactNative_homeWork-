@@ -8,6 +8,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Home from "./Screens/Home/Home";
 import MapScreen from "./Screens/MapScreen/MapScreen";
 import CommentsScreen from "./Screens/CommentsScreen/CommentsScreen";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import store from "./redux/store";
 
 const MainStack = createStackNavigator();
 
@@ -20,27 +23,37 @@ export default function App() {
     return null;
   }
   return (
-    <NavigationContainer>
-      <MainStack.Navigator initialRouteName="Login">
-        <MainStack.Screen
-          name="Registration"
-          component={RegistrationScreen}
-          options={{ headerShown: false }}
-        />
-        <MainStack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <MainStack.Screen
-          name="Home"
-          component={Home}
-          options={{ headerShown: false }}
-        />
-        <MainStack.Screen name="MapScreen" component={MapScreen} />
-        <MainStack.Screen name="CommentsScreen" component={CommentsScreen} />
-      </MainStack.Navigator>
-    </NavigationContainer>
+    <Provider store={store.store}>
+      <PersistGate
+        loading={<Text>Loading...</Text>}
+        persistor={store.persistor}
+      >
+        <NavigationContainer>
+          <MainStack.Navigator initialRouteName="Login">
+            <MainStack.Screen
+              name="Registration"
+              component={RegistrationScreen}
+              options={{ headerShown: false }}
+            />
+            <MainStack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
+            <MainStack.Screen
+              name="Home"
+              component={Home}
+              options={{ headerShown: false }}
+            />
+            <MainStack.Screen name="MapScreen" component={MapScreen} />
+            <MainStack.Screen
+              name="CommentsScreen"
+              component={CommentsScreen}
+            />
+          </MainStack.Navigator>
+        </NavigationContainer>
+      </PersistGate>
+    </Provider>
   );
 }
 

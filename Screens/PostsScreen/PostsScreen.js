@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styles } from "../../styles/styles";
 import {
   FlatList,
@@ -13,6 +13,8 @@ import { Image } from "react-native";
 import ComentsSVG from "../../Components/ComentsSVG/ComentsSVG";
 import MapPinSVG from "../../Components/MapPinSVG/MapPinSVG";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { register } from "../../redux/auth/operetions";
+import { useDispatch } from "react-redux";
 
 const defaultPosts = [
   {
@@ -66,6 +68,7 @@ const PostsScreen = () => {
 
   const navigation = useNavigation();
   const { params } = useRoute();
+
   if (params && !posts.some((el) => params.id === el.id)) {
     setPosts((prev) => [...prev, params]);
   }

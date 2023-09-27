@@ -16,12 +16,16 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { register } from "../../redux/auth/operetions";
 
 const RegistrationScreen = () => {
   const navigation = useNavigation();
   const [login, setLogin] = useState("");
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
+  const dispatch = useDispatch();
+
   // const [isShowKeyboard, setIsShowKeyboard] = useState(false);
 
   // useEffect(() => {
@@ -49,13 +53,14 @@ const RegistrationScreen = () => {
   // };
 
   const registeretions = () => {
-    Alert.alert(
-      "Credentials",
-      `Логін: ${login}
-E-mail: ${mail}
-Пароль: ${pass}`
-    );
-    navigation.navigate("Home");
+    dispatch(register({ email: mail, password: pass }));
+    //     Alert.alert(
+    //       "Credentials",
+    //       `Логін: ${login}
+    // E-mail: ${}
+    // Пароль: ${}`
+    // );
+    // navigation.navigate("Home");
   };
 
   return (
