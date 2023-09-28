@@ -18,6 +18,8 @@ import PhotoBtnSVG from "../../Components/PhotoBtnSVG/PhotoBtnSVG";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import { useNavigation } from "@react-navigation/native";
+import { db } from "../../config";
+import { addDoc, collection } from "firebase/firestore";
 
 const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
@@ -71,21 +73,32 @@ const CreatePostsScreen = () => {
   const takePhoto = async () => {
     const pic = await cameraRef.takePictureAsync();
     setPhoto(pic.uri);
-    console.log("====================================");
     console.log(pic.uri);
-    console.log("====================================");
   };
 
+  const writeDataToFirestore = async () => {
+    try {
+      const docRef = await addDoc(collection(db, "posts"), {
+        imgRef: photo,
+        location: location,
+        title: photoName,
+        locationName: photoLocetion,
+        coments: [],
+      });
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      throw e;
+    }
+  };
   const publicPost = () => {
-    console.log(location);
-    navigation.navigate("PostsScreen", {
-      id: 4,
-      img: photo,
-      location: location,
-      title: photoName,
-      comentsCount: 0,
-      locationName: photoLocetion,
-    });
+    writeDataToFirestore();
+    setPhotoName("");
+    setPhotoLocetion("");
+    setIsFormValid(false);
+    setHasPermission(null);
+    setCameraRef(null);
+    setPhoto("");
+    navigation.navigate("PostsScreen");
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -142,8 +155,8 @@ const CreatePostsScreen = () => {
                 ? styles.button
                 : [styles.button, { backgroundColor: "#F6F6F6" }]
             }
-            // onPress={isFormValid ? publicPost : null}
-            onPress={publicPost}
+            onPress={isFormValid ? publicPost : null}
+            // onPress={publicPost}
           >
             <Text
               style={

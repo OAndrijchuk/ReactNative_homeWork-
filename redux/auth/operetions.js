@@ -7,37 +7,6 @@ import {
 } from "firebase/auth";
 import { auth } from "../../config";
 
-export const register = createAsyncThunk(
-  "auth/reg",
-  async (credentials, thunkAPI) => {
-    const { email, password } = credentials;
-    try {
-      const newUser = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      return newUser.user;
-    } catch (error) {
-      alert("Введені не коректні дані!!!");
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-export const loginThunk = createAsyncThunk(
-  "auth/login",
-  async (credentials, thunkAPI) => {
-    const { email, password } = credentials;
-    try {
-      const userData = await signInWithEmailAndPassword(auth, email, password);
-      return userData.user;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
 // export const logoutThunk = createAsyncThunk(
 //   "auth/logout",
 //   async (_, thunkAPI) => {

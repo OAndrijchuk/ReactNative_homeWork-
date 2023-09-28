@@ -15,30 +15,37 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { loginThunk } from "../../redux/auth/operetions";
-import { isAuthSelector } from "../../redux/auth/selectors";
+import { register } from "../../redux/auth/authSlice";
+import { auth } from "../../config";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const dispatch = useDispatch();
-  const isAuth = useSelector(isAuthSelector);
-  useEffect(() => {
-    return () => {
-      setMail("");
-      setPass("");
-    };
-  }, []);
-  useEffect(() => {
-    console.log("isAuth===>>>", isAuth);
-    if (isAuth) {
-      navigation.navigate("Home");
-    }
-  }, [isAuth]);
 
-  const logIn = () => {
-    dispatch(loginThunk({ email: mail, password: pass }));
+  const loginUser = async (email, password) => {
+    try {
+      const userData = await signInWithEmailAndPassword(auth, email, password);
+      return userData.user;
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const logIn = async () => {
+    const userData = await loginUser(mail, pass);
+    dispatch(
+      register({
+        login: userData.displayName,
+        email: userData.email,
+        userId: userData.uid,
+      })
+    );
+    setMail("");
+    setPass("");
+    navigation.navigate("Home");
   };
 
   return (

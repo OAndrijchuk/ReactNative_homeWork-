@@ -17,8 +17,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { register } from "../../redux/auth/operetions";
-import { isAuthSelector } from "../../redux/auth/selectors";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { register } from "../../redux/auth/authSlice";
+import { auth } from "../../config";
 
 const RegistrationScreen = () => {
   const navigation = useNavigation();
@@ -26,24 +27,38 @@ const RegistrationScreen = () => {
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const dispatch = useDispatch();
-  const isAuth = useSelector(isAuthSelector);
-  useEffect(() => {
-    console.log("isAuth===>>>", isAuth);
-    if (isAuth) {
-      navigation.navigate("Home");
+
+  const registerUser = async (email, password, login) => {
+    try {
+      const userData = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(auth.currentUser, {
+        displayName: login,
+      });
+
+      return userData.user;
+    } catch (error) {
+      alert(error);
     }
-  }, [isAuth]);
+  };
 
-  useEffect(() => {
-    return () => {
-      setMail("");
-      setPass("");
-      setLogin("");
-    };
-  }, []);
-
-  const registeretions = () => {
-    dispatch(register({ email: mail, password: pass }));
+  const registeretions = async () => {
+    const userData = await registerUser(mail, pass, login);
+    console.log(userData);
+    dispatch(
+      register({
+        login: login,
+        email: userData.email,
+        userId: userData.uid,
+      })
+    );
+    setLogin("");
+    setMail("");
+    setPass("");
+    navigation.navigate("Home");
   };
 
   return (

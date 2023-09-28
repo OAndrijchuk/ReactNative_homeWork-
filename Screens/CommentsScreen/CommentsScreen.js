@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styles } from "../../styles/styles";
 import {
   Image,
@@ -6,85 +6,133 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
-
-const defaultComents = [
-  {
-    useId: 123,
-    body: "Really love your most recent photo. I’ve been trying to capture the same thing for a few months and would love some tips!",
-    useAvatar: require("../../picture/user-avatar-default.png"),
-    dataTime: "09 червня, 2020 | 08:40",
-  },
-  {
-    useId: 111,
-    body: "A fast 50mm like f1.8 would help with the bokeh. I’ve been using primes as they tend to get a bit sharper images.",
-    useAvatar: require("../../picture/user-avatar-default.png"),
-    dataTime: "09 червня, 2020 | 09:14",
-  },
-  {
-    useId: 123,
-    body: "Thank you! That was very helpful!",
-    useAvatar: require("../../picture/user-avatar-default.png"),
-    dataTime: "09 червня, 2020 | 09:20",
-  },
-];
+import SendComentSVG from "../../Components/SendComentSVG/SendComentSVG";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { db } from "../../config";
+import { useSelector } from "react-redux";
+import { userSelector } from "../../redux/auth/selectors";
 
 const CommentsScreen = () => {
-  const [coments, setComents] = useState(defaultComents);
+  const [coments, setComents] = useState([]);
   const [message, setMessage] = useState("");
-
+  const { userId } = useSelector(userSelector);
   const { params } = useRoute();
+  console.log(params);
+  useEffect(() => {
+    setComents(params.coments);
+  }, [params, coments]);
+
+  // const writeDataToFirestore = async () => {
+  //   try {
+  //     const dataTimeNow = new Date();
+  //     const typeTime = dataTimeNow.toUTCString;
+  //     const docRef = await addDoc(collection(db, "coments"), {
+  //       postId: params.id,
+  //       userId: userId,
+  //       body: message,
+  //       useAvatar: require("../../picture/user-avatar-default.png"),
+  //       time: typeTime.toString(),
+  //     });
+  //   } catch (e) {
+  //     console.error("Error adding document: ", e);
+  //     throw e;
+  //   }
+  // };
+
+  const updateDataInFirestore = async () => {
+    try {
+      const ref = doc(db, "posts", params.id);
+      const dataTimeNow = new Date();
+      const typeTime = dataTimeNow.toUTCString;
+      let newComents = params.coments.push({
+        userId: userId,
+        body: message,
+        useAvatar: require("../../picture/user-avatar-default.png"),
+        dataTime: typeTime.toString(),
+      });
+      await updateDoc(ref, {
+        ...params,
+        coments: [...newComents],
+      });
+      setComents((prev) => [
+        ...prev,
+        {
+          userId: userId,
+          body: message,
+          useAvatar: require("../../picture/user-avatar-default.png"),
+          dataTime: dataTimeNow.toUTCString,
+        },
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const sendComent = () => {
+    updateDataInFirestore();
+    setMessage("");
+  };
   return (
     <ScrollView style={commentsStyles.container}>
       <Image
-        style={commentsStyles.postPhoto}
+        style={[commentsStyles.postPhoto, { width: "100%", height: 240 }]}
         source={
-          params.img ? params.img : require("../../picture/image-not-found.jpg")
+          params.imgRef
+            ? { uri: params.imgRef }
+            : require("../../picture/image-not-found.jpg")
         }
       />
       <View style={{ flexDirection: "column", marginBottom: 50 }}>
-        {coments.map((item, index) => (
-          <View
-            key={index}
-            style={[
-              commentsStyles.comentInfo,
-              item.useId === 111
-                ? { flexDirection: "row-reverse" }
-                : { flexDirection: "row" },
-            ]}
-          >
-            <Image
-              style={commentsStyles.avatarPhoto}
-              source={
-                item.useAvatar
-                  ? item.useAvatar
-                  : require("../../picture/image-not-found.jpg")
-              }
-            />
+        {Array.isArray(coments) &&
+          coments.map((item, index) => (
             <View
-              style={{
-                maxWidth: "75%",
-                backgroundColor: "rgba(0, 0, 0, 0.03)",
-                borderRadius: 6,
-                padding: 16,
-              }}
+              key={index}
+              style={[
+                commentsStyles.comentInfo,
+                item.useId === 111
+                  ? { flexDirection: "row-reverse" }
+                  : { flexDirection: "row" },
+              ]}
             >
-              <Text style={commentsStyles.postTitle}>{item.body}</Text>
-              <Text style={commentsStyles.time}>{item.dataTime}</Text>
+              <Image
+                style={commentsStyles.avatarPhoto}
+                source={
+                  item.useAvatar
+                    ? item.useAvatar
+                    : require("../../picture/image-not-found.jpg")
+                }
+              />
+              <View
+                style={{
+                  maxWidth: "75%",
+                  backgroundColor: "rgba(0, 0, 0, 0.03)",
+                  borderRadius: 6,
+                  padding: 16,
+                }}
+              >
+                <Text style={commentsStyles.postTitle}>{item.body}</Text>
+                <Text style={commentsStyles.time}>{item.dataTime}</Text>
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
       </View>
-      <TextInput
-        style={[styles.input, commentsStyles.input]}
-        multiline={true}
-        inputMode="text"
-        value={message}
-        onChangeText={setMessage}
-        placeholder="Коментувати..."
-      />
+      <View style={{ position: "relative" }}>
+        <TextInput
+          style={[styles.input, commentsStyles.input]}
+          multiline={true}
+          inputMode="text"
+          value={message}
+          onChangeText={setMessage}
+          placeholder="Коментувати..."
+        />
+        <TouchableOpacity style={commentsStyles.sendBtn} onPress={sendComent}>
+          <SendComentSVG />
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -127,13 +175,7 @@ const commentsStyles = StyleSheet.create({
     borderRadius: 100,
     height: "auto",
     backgroundColor: "#F6F6F6",
+    paddingRight: 50,
   },
+  sendBtn: { width: 34, height: 34, position: "absolute", right: 8 },
 });
-{
-  /* <View style={postsStyles.userInfo}>
-        <Image style={postsStyles.avatarPhoto} source={avatar} />
-        <View>
-          <Text style={postsStyles.userName}>{userName}</Text>
-          <Text style={postsStyles.userEmail}>{userEmail}</Text>
-        </View> */
-}

@@ -13,8 +13,10 @@ import {
 import { StyleSheet } from "react-native";
 import ComentsSVG from "../../Components/ComentsSVG/ComentsSVG";
 import MapPinSVG from "../../Components/MapPinSVG/MapPinSVG";
-import LogOutSVG from "../../Components/LogOutSVG/LogOutSVG";
 import { TouchableOpacity } from "react-native";
+import LogOutBtn from "../../Components/LogOutBtn/LogOutBtn";
+import { useSelector } from "react-redux";
+import { userSelector } from "../../redux/auth/selectors";
 
 const defaultPosts = [
   {
@@ -39,6 +41,7 @@ const defaultPosts = [
 
 const ProfileScreen = () => {
   const [posts, setPosts] = useState(defaultPosts);
+  const { login, email } = useSelector(userSelector);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -49,9 +52,9 @@ const ProfileScreen = () => {
           style={[styles.image, { paddingTop: 150 }]}
         >
           <View style={styles.form}>
-            <TouchableOpacity style={postsStyles.logOut}>
-              <LogOutSVG />
-            </TouchableOpacity>
+            <View style={postsStyles.logOut}>
+              <LogOutBtn />
+            </View>
 
             <View style={styles.addPhoto}>
               <Image
@@ -63,7 +66,7 @@ const ProfileScreen = () => {
                 source={require("../../picture/addBtn.jpg")}
               />
             </View>
-            <Text style={styles.text}>Anonimus</Text>
+            <Text style={styles.text}>{login}</Text>
             <View>
               {posts.map((item, index) => (
                 <View key={index} style={{ gap: 8, marginTop: 32 }}>
