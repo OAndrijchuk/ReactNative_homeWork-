@@ -29,7 +29,7 @@ const CommentsScreen = () => {
   // const writeDataToFirestore = async () => {
   //   try {
   //     const dataTimeNow = new Date();
-  //     const typeTime = dataTimeNow.toUTCString;
+  //     const typeTime = dataTimeNow.toUTCString();
   //     const docRef = await addDoc(collection(db, "coments"), {
   //       postId: params.id,
   //       userId: userId,
@@ -47,12 +47,12 @@ const CommentsScreen = () => {
     try {
       const ref = doc(db, "posts", params.id);
       const dataTimeNow = new Date();
-      const typeTime = dataTimeNow.toUTCString;
+      const typeTime = dataTimeNow.toUTCString();
       let newComents = params.coments.push({
         userId: userId,
         body: message,
         useAvatar: require("../../picture/user-avatar-default.png"),
-        dataTime: typeTime.toString(),
+        dataTime: typeTime,
       });
       await updateDoc(ref, {
         ...params,
@@ -93,7 +93,7 @@ const CommentsScreen = () => {
               key={index}
               style={[
                 commentsStyles.comentInfo,
-                item.useId === 111
+                item.userId === userId
                   ? { flexDirection: "row-reverse" }
                   : { flexDirection: "row" },
               ]}
