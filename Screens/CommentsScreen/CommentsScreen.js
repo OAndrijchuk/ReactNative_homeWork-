@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { styles } from "../../styles/styles";
 import {
+  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -11,69 +12,52 @@ import {
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import SendComentSVG from "../../Components/SendComentSVG/SendComentSVG";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../config";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userSelector } from "../../redux/auth/selectors";
+import { selectComents } from "../../redux/posts/selectors";
+import { addComentThunk } from "../../redux/posts/operetions";
 
 const CommentsScreen = () => {
-  const [coments, setComents] = useState([]);
+  // const [coments, setComents] = useState([]);
   const [message, setMessage] = useState("");
   const { userId } = useSelector(userSelector);
   const { params } = useRoute();
-  console.log(params);
-  useEffect(() => {
-    setComents(params.coments);
-  }, [params, coments]);
-
-  // const writeDataToFirestore = async () => {
-  //   try {
-  //     const dataTimeNow = new Date();
-  //     const typeTime = dataTimeNow.toUTCString();
-  //     const docRef = await addDoc(collection(db, "coments"), {
-  //       postId: params.id,
-  //       userId: userId,
-  //       body: message,
-  //       useAvatar: require("../../picture/user-avatar-default.png"),
-  //       time: typeTime.toString(),
-  //     });
-  //   } catch (e) {
-  //     console.error("Error adding document: ", e);
-  //     throw e;
-  //   }
-  // };
+  const { coments } = useSelector(selectComents(params.id));
+  const dispatch = useDispatch();
 
   const updateDataInFirestore = async () => {
     try {
       const ref = doc(db, "posts", params.id);
       const dataTimeNow = new Date();
       const typeTime = dataTimeNow.toUTCString();
-      let newComents = params.coments.push({
+      const newComent = {
         userId: userId,
         body: message,
         useAvatar: require("../../picture/user-avatar-default.png"),
         dataTime: typeTime,
-      });
+      };
+      setComents((prev) => [...prev, { ...newComent }]);
       await updateDoc(ref, {
-        ...params,
-        coments: [...newComents],
+        coments: arrayUnion({ ...newComent }),
       });
-      setComents((prev) => [
-        ...prev,
-        {
-          userId: userId,
-          body: message,
-          useAvatar: require("../../picture/user-avatar-default.png"),
-          dataTime: dataTimeNow.toUTCString,
-        },
-      ]);
     } catch (error) {
       console.log(error);
     }
   };
-
+  // async await updateDataInFirestore();
   const sendComent = () => {
-    updateDataInFirestore();
+    dispatch(addComentThunk({ postId: params.id, userId, message }));
+
     setMessage("");
   };
   return (
@@ -87,7 +71,8 @@ const CommentsScreen = () => {
         }
       />
       <View style={{ flexDirection: "column", marginBottom: 50 }}>
-        {Array.isArray(coments) &&
+        {coments &&
+          Array.isArray(coments) &&
           coments.map((item, index) => (
             <View
               key={index}

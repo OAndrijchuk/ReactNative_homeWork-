@@ -18,8 +18,12 @@ import PhotoBtnSVG from "../../Components/PhotoBtnSVG/PhotoBtnSVG";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import { useNavigation } from "@react-navigation/native";
-import { db } from "../../config";
+import { db, storage } from "../../config";
 import { addDoc, collection } from "firebase/firestore";
+import { Alert } from "react-native";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { addPostThunk, getPostsThunk } from "../../redux/posts/operetions";
+import { useDispatch } from "react-redux";
 
 const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
@@ -30,12 +34,11 @@ const CreatePostsScreen = () => {
   const [cameraRef, setCameraRef] = useState(null);
   const [photo, setPhoto] = useState("");
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       await MediaLibrary.requestPermissionsAsync();
-
       setHasPermission(status === "granted");
     })();
     (async () => {
@@ -73,32 +76,49 @@ const CreatePostsScreen = () => {
   const takePhoto = async () => {
     const pic = await cameraRef.takePictureAsync();
     setPhoto(pic.uri);
-    console.log(pic.uri);
+    await MediaLibrary.createAssetAsync(pic.uri);
   };
 
-  const writeDataToFirestore = async () => {
+  const uploadImg = async () => {
     try {
-      const docRef = await addDoc(collection(db, "posts"), {
-        imgRef: photo,
+      const response = await fetch(photo);
+      const file = await response.blob();
+      const imgRef = ref(storage, `photos/${file._data.blobId}`);
+      await uploadBytes(imgRef, file).then((snapshot) => {
+        console.log("Uploaded a blob or file!", snapshot);
+      });
+      const photoUrl = await getDownloadURL(imgRef);
+      return photoUrl;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const publicPost = async () => {
+    try {
+      const img = await uploadImg();
+      const newPost = {
         location: location,
         title: photoName,
         locationName: photoLocetion,
+        imgRef: img || "",
         coments: [],
-      });
+      };
+
+      dispatch(addPostThunk(newPost));
+      navigation.navigate("PostsScreen");
+      // ====================
+      setPhotoName("");
+      setPhotoLocetion("");
+      setIsFormValid(false);
+      setHasPermission(null);
+      setCameraRef(null);
+      setPhoto("");
+      setLocation(null);
     } catch (e) {
       console.error("Error adding document: ", e);
       throw e;
     }
-  };
-  const publicPost = () => {
-    writeDataToFirestore();
-    setPhotoName("");
-    setPhotoLocetion("");
-    setIsFormValid(false);
-    setHasPermission(null);
-    setCameraRef(null);
-    setPhoto("");
-    navigation.navigate("PostsScreen");
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -156,7 +176,6 @@ const CreatePostsScreen = () => {
                 : [styles.button, { backgroundColor: "#F6F6F6" }]
             }
             onPress={isFormValid ? publicPost : null}
-            // onPress={publicPost}
           >
             <Text
               style={

@@ -18,11 +18,11 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
-const reducer = persistReducer(persistConfig, userReducer);
+// const reducer = persistReducer(persistConfig, userReducer);
 
 const store = configureStore({
   reducer: {
-    user: reducer,
+    user: persistReducer(persistConfig, userReducer),
     posts: postsReducer,
   },
   middleware: (getDefaultMiddleware) =>

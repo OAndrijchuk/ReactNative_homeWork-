@@ -2,8 +2,6 @@ import { StatusBar } from "expo-status-bar";
 import { styles } from "../../styles/styles";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Dimensions,
   Image,
   ImageBackground,
   Keyboard,
@@ -17,9 +15,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { register } from "../../redux/auth/authSlice";
-import { auth } from "../../config";
+import { registerThunk } from "../../redux/auth/operetions";
+import { userSelector } from "../../redux/auth/selectors";
 
 const RegistrationScreen = () => {
   const navigation = useNavigation();
@@ -27,34 +24,15 @@ const RegistrationScreen = () => {
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const dispatch = useDispatch();
-
-  const registerUser = async (email, password, login) => {
-    try {
-      const userData = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      await updateProfile(auth.currentUser, {
-        displayName: login,
-      });
-
-      return userData.user;
-    } catch (error) {
-      alert(error);
+  const { userId } = useSelector(userSelector);
+  useEffect(() => {
+    if (userId) {
+      navigation.navigate("Home");
     }
-  };
+  }, []);
 
-  const registeretions = async () => {
-    const userData = await registerUser(mail, pass, login);
-    console.log(userData);
-    dispatch(
-      register({
-        login: login,
-        email: userData.email,
-        userId: userData.uid,
-      })
-    );
+  const registeretions = () => {
+    dispatch(registerThunk({ mail, pass, login }));
     setLogin("");
     setMail("");
     setPass("");
@@ -69,10 +47,7 @@ const RegistrationScreen = () => {
           resizeMode="cover"
           style={styles.image}
         >
-          <View
-            // style={{ ...styles.form, marginBottom: isShowKeyboard ? -200 : 0 }}
-            style={styles.form}
-          >
+          <View style={styles.form}>
             <View style={styles.addPhoto}>
               <Image
                 style={styles.addBtn}

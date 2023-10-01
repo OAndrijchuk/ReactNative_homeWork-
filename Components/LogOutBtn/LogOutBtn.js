@@ -15,7 +15,6 @@ const LogOutBtn = () => {
   };
 
   const logOut = () => {
-    alert("You log out!!!");
     sinOut();
     navigation.navigate("Login");
   };

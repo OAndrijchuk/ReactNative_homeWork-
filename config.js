@@ -6,14 +6,12 @@ import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC8EATuSav56ud8pkILpdrRyOl_gwDHRlI",
-  authDomain: "goit-native-homework.firebaseapp.com",
-  databaseURL:
-    "https://goit-native-homework-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "goit-native-homework",
-  storageBucket: "goit-native-homework.appspot.com",
-  messagingSenderId: "278190494762",
-  appId: "1:278190494762:web:82b67950fc68207deadf53",
+  apiKey: "AIzaSyBdy1cFqert-1yd12No3FJe_Bsn9ZGpDxI",
+  authDomain: "goit-native-homework2.firebaseapp.com",
+  projectId: "goit-native-homework2",
+  storageBucket: "goit-native-homework2.appspot.com",
+  messagingSenderId: "202319145879",
+  appId: "1:202319145879:web:35bbf9fceaaf60c0ae72d2",
 };
 
 const app = initializeApp(firebaseConfig);

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { styles } from "../../styles/styles";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { View } from "react-native";
 import { ScrollView } from "react-native";
@@ -9,39 +8,21 @@ import MapPinSVG from "../../Components/MapPinSVG/MapPinSVG";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { userSelector } from "../../redux/auth/selectors";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../config";
+import { getPostsThunk } from "../../redux/posts/operetions";
+import { postsSelector } from "../../redux/posts/selectors";
 
 const PostsScreen = () => {
   const [avatar, setAvatar] = useState(
     require("../../picture/user-avatar-default.png")
   );
-  const [posts, setPosts] = useState([]);
   const navigation = useNavigation();
-  const { params } = useRoute();
   const { login, email } = useSelector(userSelector);
-  // const { posts } = useSelector(postsSelector);
-  // const dispatch = useDispatch();
+  const posts = useSelector(postsSelector);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const getDataFromFirestore = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "posts"));
-        const newPosts = [];
-        snapshot.forEach((doc) => newPosts.push({ id: doc.id, ...doc.data() }));
-        setPosts(newPosts);
-        return;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-    };
-    getDataFromFirestore();
-  }, [params, posts]);
-
-  if (params && !posts.some((el) => params.id === el.id)) {
-    setPosts((prev) => [...prev, params]);
-  }
+    dispatch(getPostsThunk());
+  }, []);
 
   const showMap = (item) => {
     navigation.navigate("MapScreen", {
@@ -65,18 +46,24 @@ const PostsScreen = () => {
         </View>
       </View>
       <View>
-        {Array.isArray(posts) &&
-          posts.map((item, index) => (
-            <View key={index} style={{ gap: 8, marginTop: 32 }}>
-              <Image
-                style={postsStyles.postPhoto}
-                source={
-                  item.imgRef
-                    ? { uri: item.imgRef }
-                    : require("../../picture/image-not-found.jpg")
-                }
-              />
-              <Text style={postsStyles.postTitle}>{item.title}</Text>
+        {posts.map((item, index) => (
+          <View key={index} style={{ gap: 8, marginTop: 32 }}>
+            <Image
+              style={postsStyles.postPhoto}
+              source={
+                item.imgRef
+                  ? { uri: item.imgRef }
+                  : require("../../picture/image-not-found.jpg")
+              }
+            />
+            <Text style={postsStyles.postTitle}>{item.title}</Text>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
               <View
                 style={{
                   flex: 1,
@@ -84,36 +71,29 @@ const PostsScreen = () => {
                   alignItems: "center",
                 }}
               >
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity onPress={() => showComents(item)}>
-                    <ComentsSVG />
-                  </TouchableOpacity>
-                  <Text style={postsStyles.userEmail}>
-                    {item.coments.length}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity onPress={() => showMap(item)}>
-                    <MapPinSVG />
-                  </TouchableOpacity>
+                <TouchableOpacity onPress={() => showComents(item)}>
+                  <ComentsSVG />
+                </TouchableOpacity>
+                <Text style={postsStyles.userEmail}>
+                  {item.coments ? item.coments.length : 0}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <TouchableOpacity onPress={() => showMap(item)}>
+                  <MapPinSVG />
+                </TouchableOpacity>
 
-                  <Text style={postsStyles.userEmail}>{item.locationName}</Text>
-                </View>
+                <Text style={postsStyles.userEmail}>{item.locationName}</Text>
               </View>
             </View>
-          ))}
+          </View>
+        ))}
       </View>
     </ScrollView>
   );

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styles } from "../../styles/styles";
 import {
-  Alert,
   ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
@@ -15,37 +14,26 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { register } from "../../redux/auth/authSlice";
-import { auth } from "../../config";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { logInThunk } from "../../redux/auth/operetions";
+import { userSelector } from "../../redux/auth/selectors";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const dispatch = useDispatch();
+  const { userId } = useSelector(userSelector);
 
-  const loginUser = async (email, password) => {
-    try {
-      const userData = await signInWithEmailAndPassword(auth, email, password);
-      return userData.user;
-    } catch (error) {
-      alert(error);
+  useEffect(() => {
+    if (userId) {
+      navigation.navigate("Home");
     }
-  };
-
-  const logIn = async () => {
-    const userData = await loginUser(mail, pass);
-    dispatch(
-      register({
-        login: userData.displayName,
-        email: userData.email,
-        userId: userData.uid,
-      })
-    );
+  }, []);
+  const logIn = () => {
+    dispatch(logInThunk({ mail, pass }));
+    navigation.navigate("Home");
     setMail("");
     setPass("");
-    navigation.navigate("Home");
   };
 
   return (

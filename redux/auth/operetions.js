@@ -7,53 +7,54 @@ import {
 } from "firebase/auth";
 import { auth } from "../../config";
 
-// export const logoutThunk = createAsyncThunk(
-//   "auth/logout",
-//   async (_, thunkAPI) => {
-//     try {
-//       const { data } = await API.delete("/api/auth/sign-out");
-//       clearToken();
-//       return data;
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error.message);
-//     }
-//   }
-// );
-// export const currentUser = createAsyncThunk(
-//   "auth/currentUser",
-//   async (_, thunkAPI) => {
-//     const state = thunkAPI.getState();
-//     const newToken = state.user.token;
-//     if (!newToken) {
-//       return thunkAPI.rejectWithValue("NO autorization!!!");
-//     }
-//     setToken(newToken);
-//     try {
-//       const { data } = await API.get("/api/users/current");
+export const registerThunk = createAsyncThunk(
+  "auth/register",
+  async (credentials, thunkAPI) => {
+    const { login } = credentials;
+    const email = credentials.mail;
+    const password = credentials.pass;
+    try {
+      const userData = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(auth.currentUser, {
+        displayName: login,
+      });
 
-//       return data;
-//     } catch (error) {
-//       return thunkAPI.rejectWithValue(error.message);
-//     }
-//   }
-// );
+      return {
+        login: login,
+        email: userData.user.email,
+        userId: userData.user.uid,
+      };
+      // return userData.user;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+export const logInThunk = createAsyncThunk(
+  "auth/logIn",
+  async (credentials, thunkAPI) => {
+    const email = credentials.mail;
+    const password = credentials.pass;
+    try {
+      const userData = await signInWithEmailAndPassword(auth, email, password);
+      return {
+        login: userData.user.displayName,
+        email: userData.user.email,
+        userId: userData.user.uid,
+      };
+      // return userData.user;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
 
 const authStateChanged = async (onChange = () => {}) => {
   onAuthStateChanged((user) => {
     onChange(user);
   });
-};
-
-const updateUserProfile = async (update) => {
-  const user = auth.currentUser;
-
-  // якщо такий користувач знайдений
-  if (user) {
-    // оновлюємо його профайл
-    try {
-      await updateProfile(user, update);
-    } catch (error) {
-      throw error;
-    }
-  }
 };
