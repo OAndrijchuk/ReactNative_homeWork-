@@ -23,7 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.yourapp.package.name",
+      "package": "com.oleh.andrijchuk.AwesomeProject",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyBGgEXg6s7gqVXeIYN_GRy96OaM6L1qrc0"
@@ -32,6 +32,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8d8d8969-8898-4027-a29b-7148ea0ba596"
+      }
     }
   }
 }

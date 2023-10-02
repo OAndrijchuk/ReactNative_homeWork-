@@ -33,7 +33,6 @@ const PostsScreen = () => {
   const showComents = (item) => {
     navigation.navigate("CommentsScreen", item);
   };
-
   return (
     <ScrollView style={postsStyles.container}>
       <View style={postsStyles.userInfo}>
